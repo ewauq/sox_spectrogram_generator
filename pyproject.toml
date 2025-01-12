@@ -1,0 +1,7 @@
+[tool.ruff]
+line-length = 100
+fix = true
+unsafe-fixes = true
+
+[tool.ruff.format]
+line-ending = "lf"
