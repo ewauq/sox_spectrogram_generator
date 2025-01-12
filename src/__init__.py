@@ -138,14 +138,9 @@ class Plugin(BasePlugin):
         if VERBOSE:
             self.log("Plugin initialized")
 
-    def download_finished_notification(
-        self, user: str, virtual_path: str, real_path: str
-    ):
+    def download_finished_notification(self, user: str, virtual_path: str, real_path: str):
         if VERBOSE:
-            self.log(
-                f"Finished downloading {virtual_path} from user {user}."
-                f"Saved at {real_path}"
-            )
+            self.log(f"Finished downloading {virtual_path} from user {user}. Saved at {real_path}")
 
         extension = Path(real_path).suffix.lower()
         if extension.lower() in [".aiff", ".flac", ".mp3", ".ogg", ".wav"]:
