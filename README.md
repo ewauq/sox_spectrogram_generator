@@ -120,7 +120,7 @@ Use a white background instead of the black one.
 
 - Default value: _off_
 
-## Brightness
+### Brightness
 
 Allows brightness adjustments of the audio spectrogram, if needed.
 
