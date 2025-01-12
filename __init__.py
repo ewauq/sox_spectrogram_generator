@@ -11,10 +11,18 @@ class Plugin(BasePlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Settings code
+        self.settings = {
+            "sox_path": None,
+        }
+        self.metasettings = {
+            "sox_path": {
+                "description": "Path to SoX binary (leave empty to use the system PATH)",
+                "type": "string",
+            },
+        }
 
         if VERBOSE:
-            self.log("Plugin settings initialized")
+            self.log("Plugin initialized")
 
     def download_finished_notification(
         self, user: str, virtual_path: str, real_path: str
@@ -58,7 +66,7 @@ class Plugin(BasePlugin):
 
     def build_arguments(self, input_file_path: Path, output_file_path: Path) -> list:
         command = [
-            "sox",
+            self.settings["sox_path"] or "sox",
             input_file_path.as_posix(),
             "-n",
             "remix",
@@ -67,5 +75,8 @@ class Plugin(BasePlugin):
             "-o",
             output_file_path.as_posix(),
         ]
+
+        if VERBOSE:
+            self.log(f"Running command: {' '.join(command)}")
 
         return command
