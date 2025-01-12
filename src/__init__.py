@@ -5,7 +5,7 @@ from subprocess import Popen
 
 from pynicotine.pluginsystem import BasePlugin
 
-VERBOSE = True
+VERBOSE = False
 
 
 class Plugin(BasePlugin):
@@ -17,7 +17,7 @@ class Plugin(BasePlugin):
             "channels": "Left and right (default)",
             "width": 800,
             "height": 257,
-            "title": "Hide title (default)",
+            "title": "No title (default)",
             "comment": "Created by SoX",
             "start_position": 0,
             "duration": 0,
@@ -62,7 +62,7 @@ class Plugin(BasePlugin):
                 "description": "Title to display at the top of the generated image",
                 "type": "dropdown",
                 "options": [
-                    "Hide title (default)",
+                    "No title (default)",
                     "Filename without extension",
                     "Filename with extension",
                     "Full path, filename and extension",
