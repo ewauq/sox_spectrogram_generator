@@ -14,7 +14,7 @@ A plugin for [Nicotine+](https://nicotine-plus.org/) that generates spectrograms
 
 ## ⚙️ Settings
 
-#### Path to SoX binary
+### Path to SoX binary
 
 The SoX path to the executable.
 
@@ -22,7 +22,7 @@ Leave the value empty if SoX is already in your system PATH. If not, you can spe
 
 - Default value : _empty_ (taken from the PATH)
 
-#### Audio channel
+### Audio channel
 
 Audio channel to generate the spectrogram from.
 
@@ -30,7 +30,7 @@ If you want to generate an audio spectrogram from just one channel, change it to
 
 - Default value: _Left and right_
 
-#### Spectrogram width and height
+### Spectrogram width and height
 
 Width and height in pixels of an audio channel spectrogram.
 
@@ -43,7 +43,7 @@ This refers to the size of the spectrogram area, not the overall image dimension
 
 Note: to prevent a slow generation, the height must always be a power of two plus one. The value will be automatically adjusted to fit this requirement (e.g., 512 will be modified to 513).
 
-#### Title
+### Title
 
 Title to display at the top of the generated image.
 
@@ -51,7 +51,7 @@ It can be the filename without the extension, the filename with the extension or
 
 - Default value: _no title_
 
-#### Comment
+### Comment
 
 Comment to display at the bottom left of the image.
 
@@ -59,7 +59,7 @@ Some text to replace "Created by SoX". Be aware that if the comment is wider tha
 
 - Default value: _Created by SoX_
 
-#### Starting position
+### Starting position
 
 Starting analysis position in seconds.
 
@@ -67,7 +67,7 @@ If you want to start the audio analysis further from the beginning, you can spec
 
 - Default value: _0_
 
-#### Duration
+### Duration
 
 Duration of the analysis in seconds.
 
@@ -75,7 +75,7 @@ If you just want an audio spectrogram of a 30 seconds audio clip, change the val
 
 - Default value: _0_
 
-#### Window function
+### Window function
 
 The window parameter to use to generate the audio spectrogram.
 
@@ -92,7 +92,7 @@ Available options:
 
 - Default value: _Hann_
 
-#### Monochrome
+### Monochrome
 
 Generate a monochromatic spectrogram
 
@@ -100,7 +100,7 @@ Will generate a black and white audio spectrogram image.
 
 - Default value: _off_
 
-#### Raw image
+### Raw image
 
 Hide axes and labels.
 
@@ -108,7 +108,7 @@ Will generate a raw spectrogram image without any text, borders, margins, just t
 
 - Default value: _off_
 
-#### High color mode
+### High color mode
 
 Use the high-intensity color mode.
 
@@ -116,27 +116,27 @@ Will saturate colors which is less visually pleasing than the default colour pal
 
 - Default value: _off_
 
-#### Light mode
+### Light mode
 
 Use a white background instead of the black one.
 
 - Default value: _off_
 
-### Brightness
+## Brightness
 
 Allows brightness adjustments of the audio spectrogram, if needed.
 
 - Range: _20_ to _180_
 - Default value: _120_
 
-#### Contrast
+### Contrast
 
 Allows contrast adjustments of the audio spectrogram, if needed.
 
 - Range: _-100_ to _100_
 - Default value: _0_
 
-#### Number of colors
+### Number of colors
 
 Allows to change the number of colors to render the audio spectrogram. Low values give a poster-like effect and produce smaller PNG files.
 
