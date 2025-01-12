@@ -30,16 +30,13 @@ class Plugin(BasePlugin):
             self.generate_spectrogram(real_path)
 
     def generate_spectrogram(self, audio_file_path: str):
-        if VERBOSE:
-            self.log("Generating SoX spectrogram...")
-
         input_file_path = Path(audio_file_path)
         input_filename = input_file_path.stem
         input_directory = input_file_path.parent
         output_file_path = Path(input_directory, f"{input_filename}.png")
 
         if not input_file_path.exists():
-            self.log(f"File not found at {input_file_path}")
+            self.log(f"File not found: {input_file_path}")
 
         if VERBOSE:
             self.log(f"Generating spectrogram for '{input_filename}...'")
