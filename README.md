@@ -10,7 +10,7 @@ A plugin for [Nicotine+](https://nicotine-plus.org/) that generates spectrograms
 
 - You need to have the [SoX binary](https://sourceforge.net/projects/sox/) on your system. You can add it to your system PATH or set a custom path to the SoX binary in the plugin settings.
 
-- Windows users only: since the **MAD decoder library** is not bundled with SoX for patent reasons, you will need to add it manually. You can either compile it yourself from [the source](https://www.underbit.com/products/mad/), or copy a compiled version of `libmad.dll` in the same directory as SoX binary. You can find the file on this repository which is provided by [videohelp.com](https://www.videohelp.com/software?d=sox-14.4.0-libmad-libmp3lame.zip).
+- Windows users only: since the **MAD decoder library** is not bundled with SoX for patent reasons, you will need to add it manually. You can either compile it yourself from [the source](https://www.underbit.com/products/mad/), or copy a compiled version of `libmad.dll` in the same directory as SoX binary. You can find the file [on this repository](https://github.com/ewauq/sox_spectrogram_generator/lib) which is provided by [videohelp.com](https://www.videohelp.com/software?d=sox-14.4.0-libmad-libmp3lame.zip).
 
 ## ⚙️ Settings
 
