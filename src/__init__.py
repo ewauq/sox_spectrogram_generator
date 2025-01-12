@@ -9,7 +9,7 @@ VERBOSE = False
 
 
 class Plugin(BasePlugin):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.settings = {
@@ -138,7 +138,7 @@ class Plugin(BasePlugin):
         if VERBOSE:
             self.log("Plugin initialized")
 
-    def download_finished_notification(self, user: str, virtual_path: str, real_path: str):
+    def download_finished_notification(self, user: str, virtual_path: str, real_path: str) -> None:
         if VERBOSE:
             self.log(f"Finished downloading {virtual_path} from user {user}. Saved at {real_path}")
 
@@ -146,7 +146,7 @@ class Plugin(BasePlugin):
         if extension.lower() in [".aiff", ".flac", ".mp3", ".ogg", ".wav"]:
             self.generate_spectrogram(real_path)
 
-    def generate_spectrogram(self, audio_file_path: str):
+    def generate_spectrogram(self, audio_file_path: str) -> None:
         input_file_path = Path(audio_file_path)
         input_filename = input_file_path.stem
         input_directory = input_file_path.parent
