@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pathlib import Path
 from subprocess import Popen
@@ -33,8 +34,8 @@ class Plugin(BasePlugin):
                 f"Saved at {real_path}"
             )
 
-        extension = real_path.split(".")[-1]
-        if extension.lower() in ["aiff", "flac", "mp3", "ogg", "wav"]:
+        extension = Path(real_path).suffix.lower()
+        if extension.lower() in [".aiff", ".flac", ".mp3", ".ogg", ".wav"]:
             self.generate_spectrogram(real_path)
 
     def generate_spectrogram(self, audio_file_path: str):
@@ -45,6 +46,13 @@ class Plugin(BasePlugin):
 
         if not input_file_path.exists():
             self.log(f"File not found: {input_file_path}")
+
+        sox_path = self.settings["sox_path"] or shutil.which("sox")
+        if not sox_path:
+            self.log(
+                "SoX binary not found. Please set the correct path in the plugin settings."
+            )
+            return
 
         if VERBOSE:
             self.log(f"Generating spectrogram for '{input_filename}...'")
