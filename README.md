@@ -100,13 +100,13 @@ Will generate a black and white audio spectrogram image.
 
 - Default value: _off_
 
-#### Raw
+#### Raw image
 
 Hide axes and labels.
 
 Will generate a raw spectrogram image without any text, borders, margins, just the spectrogram areas.
 
-- Default value: _ off_
+- Default value: _off_
 
 #### High color mode
 
