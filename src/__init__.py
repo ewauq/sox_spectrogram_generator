@@ -1,11 +1,12 @@
+import concurrent.futures
 import shutil
 import subprocess
 from pathlib import Path
-from subprocess import Popen
 
 from pynicotine.pluginsystem import BasePlugin
 
 VERBOSE = False
+PROCESSES_MAX = 3
 
 
 class Plugin(BasePlugin):
@@ -29,6 +30,7 @@ class Plugin(BasePlugin):
             "brightness": 120,
             "contrast": 0,
             "number_of_colors": 249,
+            "number_of_concurrent_processes": 2,
         }
         self.metasettings = {
             "sox_path": {
@@ -133,7 +135,17 @@ class Plugin(BasePlugin):
                 "maximum": 249,
                 "stepsize": 2,
             },
+            "number_of_concurrent_processes": {
+                "description": "Maximum number of SoX processes that can run simultaneously (default: 2).",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12,
+                "stepsize": 1,
+            },
         }
+
+        max_wokers = max(min(self.settings["number_of_concurrent_processes"], 12), 1)
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_wokers)
 
         if VERBOSE:
             self.log("Plugin initialized")
@@ -144,7 +156,7 @@ class Plugin(BasePlugin):
 
         extension = Path(real_path).suffix.lower()
         if extension.lower() in [".aiff", ".flac", ".mp3", ".ogg", ".wav"]:
-            self.generate_spectrogram(real_path)
+            self.executor.submit(self.generate_spectrogram, real_path)
 
     def generate_spectrogram(self, audio_file_path: str) -> None:
         input_file_path = Path(audio_file_path)
@@ -170,14 +182,19 @@ class Plugin(BasePlugin):
         arguments = self.build_arguments(input_file_path, output_file_path)
 
         try:
-            Popen(
+            process = subprocess.Popen(
                 arguments,
                 stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 shell=True,
                 start_new_session=True,
             )
+            stdout, stderr = process.communicate()
 
-            self.log(f"Spectrogram saved at {output_file_path}")
+            if process.returncode == 0:
+                self.log(f"Spectrogram saved at {output_file_path}")
+            else:
+                self.log(f"An error occurred: {stderr.decode().strip()}")
 
         except Exception as error:
             self.log(f"An error occurred: {error}")
