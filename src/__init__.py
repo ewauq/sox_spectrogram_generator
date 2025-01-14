@@ -6,7 +6,6 @@ from pathlib import Path
 from pynicotine.pluginsystem import BasePlugin
 
 VERBOSE = False
-PROCESSES_MAX = 3
 
 
 class Plugin(BasePlugin):
