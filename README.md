@@ -141,15 +141,4 @@ Allows to change the number of colors to render the audio spectrogram. Low value
 - Range: _1_ to _249_
 - Default value: _249_
 
-### Number of concurrent SoX processes
-
-Defines the maximum number of SoX processes that can run simultaneously.
-
-Increasing this number may speed up spectrogram generation when processing multiple files but can also put significant strain on your CPU. Adjust based on your system's capabilities and workload requirements. For most users, the default value of 2 strikes a good balance between performance and resource usage.
-
-**Warning: Setting this value too high on systems with limited CPU cores may lead to slower performance or unresponsive behavior.**
-
-- Range: _1_ to _12_
-- Default value: _2_
-
 (some descriptions were taken from the [SoX manual](https://linux.die.net/man/1/sox))

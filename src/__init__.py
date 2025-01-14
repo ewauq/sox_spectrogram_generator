@@ -6,6 +6,7 @@ from pathlib import Path
 from pynicotine.pluginsystem import BasePlugin
 
 VERBOSE = False
+MAX_WORKERS = 1
 
 
 class Plugin(BasePlugin):
@@ -29,7 +30,6 @@ class Plugin(BasePlugin):
             "brightness": 120,
             "contrast": 0,
             "number_of_colors": 249,
-            "number_of_concurrent_processes": 2,
         }
         self.metasettings = {
             "sox_path": {
@@ -134,17 +134,9 @@ class Plugin(BasePlugin):
                 "maximum": 249,
                 "stepsize": 2,
             },
-            "number_of_concurrent_processes": {
-                "description": "Maximum number of SoX processes that can run simultaneously (default: 2).",
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 12,
-                "stepsize": 1,
-            },
         }
 
-        max_wokers = max(min(self.settings["number_of_concurrent_processes"], 12), 1)
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_wokers)
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
         if VERBOSE:
             self.log("Plugin initialized")
