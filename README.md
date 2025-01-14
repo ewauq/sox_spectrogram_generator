@@ -141,5 +141,4 @@ Allows to change the number of colors to render the audio spectrogram. Low value
 - Range: _1_ to _249_
 - Default value: _249_
 
-
 (some descriptions were taken from the [SoX manual](https://linux.die.net/man/1/sox))

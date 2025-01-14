@@ -1,4 +1,4 @@
-Version = "2025-01-12r00"
+Version = "2025-01-14r00"
 Authors = ["Kazaam"]
 Name = "SoX Spectrogram Generator"
 Description = "Generate an audio spectrogram image with SoX when an audio file has finished downloading."

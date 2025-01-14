@@ -1,11 +1,12 @@
+import concurrent.futures
 import shutil
 import subprocess
 from pathlib import Path
-from subprocess import Popen
 
 from pynicotine.pluginsystem import BasePlugin
 
 VERBOSE = False
+MAX_WORKERS = 1
 
 
 class Plugin(BasePlugin):
@@ -135,6 +136,8 @@ class Plugin(BasePlugin):
             },
         }
 
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS)
+
         if VERBOSE:
             self.log("Plugin initialized")
 
@@ -144,7 +147,7 @@ class Plugin(BasePlugin):
 
         extension = Path(real_path).suffix.lower()
         if extension.lower() in [".aiff", ".flac", ".mp3", ".ogg", ".wav"]:
-            self.generate_spectrogram(real_path)
+            self.executor.submit(self.generate_spectrogram, real_path)
 
     def generate_spectrogram(self, audio_file_path: str) -> None:
         input_file_path = Path(audio_file_path)
@@ -170,14 +173,19 @@ class Plugin(BasePlugin):
         arguments = self.build_arguments(input_file_path, output_file_path)
 
         try:
-            Popen(
+            process = subprocess.Popen(
                 arguments,
                 stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 shell=True,
                 start_new_session=True,
             )
+            stdout, stderr = process.communicate()
 
-            self.log(f"Spectrogram saved at {output_file_path}")
+            if process.returncode == 0:
+                self.log(f"Spectrogram saved at {output_file_path}")
+            else:
+                self.log(f"An error occurred: {stderr.decode().strip()}")
 
         except Exception as error:
             self.log(f"An error occurred: {error}")
