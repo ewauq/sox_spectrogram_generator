@@ -1,8 +1,10 @@
 import concurrent.futures
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
+from pynicotine.events import events
 from pynicotine.pluginsystem import BasePlugin
 
 VERBOSE = False
@@ -141,13 +143,25 @@ class Plugin(BasePlugin):
         if VERBOSE:
             self.log("Plugin initialized")
 
+    def disable(self) -> None:
+        self.executor.shutdown(wait=False, cancel_futures=True)
+
     def download_finished_notification(self, user: str, virtual_path: str, real_path: str) -> None:
         if VERBOSE:
             self.log(f"Finished downloading {virtual_path} from user {user}. Saved at {real_path}")
 
         extension = Path(real_path).suffix.lower()
-        if extension.lower() in [".aiff", ".flac", ".mp3", ".ogg", ".wav"]:
+        if extension in (".aiff", ".flac", ".mp3", ".ogg", ".wav"):
             self.executor.submit(self.generate_spectrogram, real_path)
+
+    def _log_main(self, message: str) -> None:
+        """Dispatch self.log to the main thread.
+
+        self.log() ends up emitting the 'log-message' event which is consumed
+        by the GTK log view. Emitting it directly from a worker thread is not
+        safe and can cause UI freezes or crashes.
+        """
+        events.invoke_main_thread(self.log, message)
 
     def generate_spectrogram(self, audio_file_path: str) -> None:
         input_file_path = Path(audio_file_path)
@@ -157,43 +171,51 @@ class Plugin(BasePlugin):
         sox_path = self.settings["sox_path"] or shutil.which("sox")
 
         if not input_file_path.exists():
-            self.log(f"File not found: {input_file_path}")
+            self._log_main(f"File not found: {input_file_path}")
+            return
 
         if not sox_path:
-            self.log(
-                "SoX binary not found."
-                "Please set the correct SoX binary path in the plugin settings."
+            self._log_main(
+                "SoX binary not found. "
+                "Please set the correct SoX binary path in the plugin settings. "
                 "The path must contain the 'sox' executable."
             )
             return
 
         if VERBOSE:
-            self.log(f"Generating spectrogram for '{input_filename}...'")
+            self._log_main(f"Generating spectrogram for '{input_filename}'...")
 
-        arguments = self.build_arguments(input_file_path, output_file_path)
+        arguments = self.build_arguments(sox_path, input_file_path, output_file_path)
+
+        # Hide the transient console window SoX would otherwise pop up on Windows.
+        creationflags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
 
         try:
             process = subprocess.Popen(
                 arguments,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                shell=True,
-                start_new_session=True,
+                creationflags=creationflags,
             )
-            stdout, stderr = process.communicate()
+            try:
+                _, stderr = process.communicate(timeout=120)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.communicate()
+                self._log_main(f"SoX timed out after 120s for {input_file_path.name}, killed.")
+                return
 
             if process.returncode == 0:
-                self.log(f"Spectrogram saved at {output_file_path}")
+                self._log_main(f"Spectrogram saved at {output_file_path}")
             else:
-                self.log(f"An error occurred: {stderr.decode().strip()}")
+                self._log_main(f"An error occurred: {stderr.decode(errors='replace').strip()}")
 
         except Exception as error:
-            self.log(f"An error occurred: {error}")
+            self._log_main(f"An error occurred: {error}")
 
-    def build_arguments(self, input_file_path: Path, output_file_path: Path) -> list:
+    def build_arguments(self, sox_path: str, input_file_path: Path, output_file_path: Path) -> list:
         arguments = [
-            # SoX executable binary file
-            self.settings["sox_path"] or "sox",
+            sox_path,
         ]
 
         # Input file to be processed
@@ -222,12 +244,10 @@ class Plugin(BasePlugin):
 
         # Height of an audio spectrogram channel
         if self.settings["height"]:
-            height = self.settings["height"]
-            # SoX requires a power of two + one for the height
-            if height % 2 != 1:
-                height = height + 1
-
-            height = max(min(height, 513), 64)
+            # SoX requires the height to be a power of two plus one.
+            # Snap the user value to the nearest valid choice.
+            valid_heights = (65, 129, 257, 513)
+            height = min(valid_heights, key=lambda v: abs(v - self.settings["height"]))
             arguments.append("-y")
             arguments.append(str(height))
 
@@ -273,10 +293,6 @@ class Plugin(BasePlugin):
         if self.settings["monochrome"]:
             arguments.append("-m")
 
-        # Raw spectrogram flag
-        if self.settings["raw"]:
-            arguments.append("-r")
-
         # High color mode flag
         if self.settings["high_color_mode"]:
             arguments.append("-h")
@@ -297,7 +313,7 @@ class Plugin(BasePlugin):
 
         # Number of colors (quantization)
         if self.settings["number_of_colors"]:
-            number_of_colors = max(min(self.settings["number_of_colors"], 1), 249)
+            number_of_colors = max(min(self.settings["number_of_colors"], 249), 1)
             arguments.append("-q")
             arguments.append(str(number_of_colors))
 
@@ -306,6 +322,6 @@ class Plugin(BasePlugin):
         arguments.append(output_file_path.as_posix())
 
         if VERBOSE:
-            self.log(f"Running command: {' '.join(arguments)}")
+            self._log_main(f"Running command: {' '.join(arguments)}")
 
         return arguments
